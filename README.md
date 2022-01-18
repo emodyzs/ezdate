@@ -51,7 +51,7 @@ Előfeltétel:  Python 3.7 vagy későbbi
 
 ## Függvények részletezése
 
-**text2date**( text, context='', outtype='first' ):
+**text2date**( text, dt0=None, context='', outtype='first' ):
 - **text**:  általában több szavas kifejezés vagy mondat
         A mondatban időhatározókon és számokon kívüli szavak is lehetnek (a dátum bárhol lehet a szövegen belül).
 - **dt0**:  relációs dátummeghatározások esetén a kiinduló dátum.
