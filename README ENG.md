@@ -50,7 +50,7 @@ Prerequisite: Python 3.7 or later
 
 ## Details
 
-**text2date** (text, context = '', outtype = 'first'):
+**text2date** (text, dt0=None, context = '', outtype = 'first'):
 - **text**: usually a multi-word expression or sentence
         The sentence can contain words other than timestamps and numbers (the date can be anywhere within the text).
 - **dt0**: the starting date for relational date definitions.
