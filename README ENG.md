@@ -44,11 +44,11 @@ Prerequisite: Python 3.7 or later
   See examples in ezdate_teszt.py
 
 
-## Functions for the module
+## Functions in the module
 - **text2date**(): ("Text to date") Translate Hungarian datetime expressions to special date or date range
 
 
-## Detailing functions
+## Details
 
 **text2date** (text, context = '', outtype = 'first'):
 - **text**: usually a multi-word expression or sentence
