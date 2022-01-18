@@ -37,16 +37,18 @@ def fn_monday(dt='today'):
 
 
 
-def text2date(text,context='',outtype='first'):
+def text2date(text,dt0=None,tense='',outtype='first'):
     ''' Magyar nyelvű időmeghatározások lefordítása egy dátumra vagy dátum tartományra
     text:  általában több szavas
         A mondatban dátum-meghatározástól független szavak is lehetnek
-    context: 'future' / 'past'.  A nem egyértelmű időmeghatározások esetén jövőbeli vagy múltbeli dátumot preferáljon a függvény
+    dt0:  relációs dátummeghatározások esetén a kiinduló dátum.
+        Ha nincs megadva, akkor a mai nap.
+    tense: 'future' / 'past'.  A nem egyértelmű időmeghatározások esetén jövőbeli vagy múltbeli dátumot preferáljon a függvény
         Ha üres, akkor az aktuális évben/hónapban/héten
     outtype:
       'first':    return =  '',   '2021.10.12',  '2021.12.10-2021.12.20'     Az első előforduló dátum vagy dátumtartomány.
       'first+':   ugyanaz mint a first, de a string végére beírja a pattern-t is   Példa: '2021.10.12   pattern: [szám] [hónapnév] [szám]
-
+      'all':      '2021.10.12,2021.12.10-2021.12.20'
     '''
     
     # Annnotálás
@@ -57,9 +59,10 @@ def text2date(text,context='',outtype='first'):
         return  szám_in and endwith(szám_in,r'\.|dik|első')
 
 
-    def sub_patterns(patternL,invaluesL,outvaluesL,nCycle):   # -> (date1, date2)  vagy None 
+    def sub_patterns(patternL,invaluesL,outvaluesL,nCycle,dt0):   # -> (date1, date2)  vagy None 
 
-        dt0=datetime.now()
+        if dt0==None: dt0=datetime.now()
+
         dtout=None
         dtout2=None
 
@@ -181,8 +184,8 @@ def text2date(text,context='',outtype='first'):
 
                     dtout=datetime(dt0.year,n,1)         # aktuális évben
                     # Ha van kontextus, akkor eltolásra lehet szükség
-                    if context=='future' and n<dt0.month: dtout=fn_dateadd(dtout,1,'year')
-                    elif context=='past' and n>dt0.month: dtout=fn_dateadd(dtout,-1,'year')
+                    if tense=='future' and n<dt0.month: dtout=fn_dateadd(dtout,1,'year')
+                    elif tense=='past' and n>dt0.month: dtout=fn_dateadd(dtout,-1,'year')
                     dtout2=fn_monthlastday(dtout)
 
             elif patternL=='[hétnapja]':
@@ -191,13 +194,13 @@ def text2date(text,context='',outtype='first'):
                 # Az aktuális héten
                 if hétnapja=='hétvége': 
                     dtout=fn_dateadd(dtMonday,5)    # szombat
-                    if context=='past' and dtout>dt0: dtout=fn_dateadd(dtout,-7)
+                    if tense=='past' and dtout>dt0: dtout=fn_dateadd(dtout,-7)
                     dtout2=fn_dateadd(dtout,1)
                 else:
                     dtout=fn_dateadd(dtMonday,int(hétnapja)-1)
                     # Ha van kontextus, akkor eltolásra lehet szükség
-                    if context=='future' and dtout<dt0: dtout=fn_dateadd(dtout,7)
-                    elif context=='past' and dtout>dt0: dtout=fn_dateadd(dtout,-7)
+                    if tense=='future' and dtout<dt0: dtout=fn_dateadd(dtout,7)
+                    elif tense=='past' and dtout>dt0: dtout=fn_dateadd(dtout,-7)
 
             elif patternL=='[évszak]':
                 value,=outvaluesL
@@ -209,10 +212,10 @@ def text2date(text,context='',outtype='first'):
                 dtout2=fn_monthlastday(fn_dateadd(dtout,2,'month'))
 
                 # Ha van kontextus, akkor eltolásra lehet szükség
-                if context=='future' and dt0>dtout2:   # "télen hideg lesz",  az aktuális tél után vagyunk
+                if tense=='future' and dt0>dtout2:   # "télen hideg lesz",  az aktuális tél után vagyunk
                     dtout=fn_dateadd(dtout,1,'year')
                     dtout2=fn_monthlastday(fn_dateadd(dtout,2,'month'))
-                elif context=='past' and dt0<dtout:   # "télen hideg volt",  az aktuális tél előtt vagyunk
+                elif tense=='past' and dt0<dtout:   # "télen hideg volt",  az aktuális tél előtt vagyunk
                     dtout=fn_dateadd(dtout,-1,'year')
                     dtout2=fn_monthlastday(fn_dateadd(dtout,2,'month'))
             
@@ -848,7 +851,7 @@ def text2date(text,context='',outtype='first'):
                 for value in outvalues_sync[nWindowStart:nWindowStart+nWindowLen]:
                     if value: outvaluesL.append(value)   # a None értékek nem kellenek
                 # beazonosítható-e dátumként
-                dates=sub_patterns(patternL,invaluesL,outvaluesL,nCycle)
+                dates=sub_patterns(patternL,invaluesL,outvaluesL,nCycle,dt0)
                 if dates:
                     pattern=' '.join([*patternwords[:nWindowStart],'[dátum]',*patternwords[nWindowStart+nWindowLen:]])
                     pattern=trim(pattern)
@@ -873,6 +876,7 @@ def text2date(text,context='',outtype='first'):
                 nCycle=2
             elif nCycle==2:
                 # Megnézendő, hogy volt-e sikeres dátumbeazonosítás (az első lesz a return)
+                dátumok=[]
                 nValueIndex=-1
                 patternwords=pattern.split()
                 for patternword in patternwords:
@@ -882,7 +886,11 @@ def text2date(text,context='',outtype='first'):
                         if date2 and date2!=date1: result=date1.strftime('%Y.%m.%d') + '-' + date2.strftime('%Y.%m.%d')
                         else: result=date1.strftime('%Y.%m.%d')
                         if outtype=='first+': result=result + '    pattern: ' + pattern + '  outvalues: ' + str(outvalues)
-                        return result
+                        if outtype in ['first','first+']:
+                            return result
+                        dátumok.append(result)
+                if len(dátumok)>0:
+                    return ','.join(dátumok)
 
                 # sikertelen  (egyetlen dátum sem volt a szövegben)
                 if outtype=='first':  result=''
