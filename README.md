@@ -68,6 +68,7 @@ Említést érdemel még a **Duckling** dátum extraktora. Maga a Duckling jelen
 - **tense**: 'future' / 'past'.  A nem egyértelmű időmeghatározások esetén jövőbeli vagy múltbeli dátumot preferáljon a függvény
 - **outtype**:
     - '**first**':    return =  '',   '2021.10.12',  '2021.12.10-2021.12.20'     Az első előforduló dátum vagy dátumtartomány.
-    - '**first+**':   ugyanaz mint a first, de - elemzési-ellenőrzési céllal - a string végére beírja a mintázatot és a helyettesőjelek kimeneti értékét is.
+    - '**first+**':   ugyanaz mint a first, de - elemzési-ellenőrzési céllal - a string végére beírja a mintázatot és a helyettesőjelek kimeneti értékét is.\
               Példa: '2021.10.12   pattern: [szám] [hónapnév] [szám]   outvalues: [2021, 'október', 'tizenkettedike']
-    - '**all**':    '2021.10.12,2021.12.10-2021.12.20'
+    - '**all**':  a szövegben előforduló összes dátum-kifejezés lefordított értékének vesszős felsorolása\
+              Példa:  '2021.10.12,2021.12.10-2021.12.20'     (a felsorolásban egyedi dátumok és dátumtartományok is előfordulhatnak)
