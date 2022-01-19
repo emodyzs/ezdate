@@ -34,6 +34,16 @@ Előfeltétel:  Python 3.7 vagy későbbi
 - legyen érzéketlen a hosszú és rövid ékezetek elírására
 - a dátumszavak beazonosításakor engedjen meg kismértékű elgépeléseket is (fuzzy search)
 
+**Összehasonlítás más szoftverekkel**
+A jelen szoftver fejlesztésének megkezdése előtt egyetlen olyan publikus szoftvert sikerült felkutatni, amely képes a magyar dátumkifejezések viszonylag átfogó beazonosítására és értelmezésére:\
+  "hun-date-parser", a "szegedai" fejlesztői git-hub oldalon.
+Ugyanehhez a fejlesztői közösséghez tartoznak - részben vagy egészében - a Hungarian NER és a HuSapcy szoftverek, tehát a magyar nyelvű NLP alapkutatásban járatos fejlesztőkról van szó.\
+Azért tartottuk szükségesnek egy új, magyar nyelvű dátum-interpretáló szoftver létrehozását, mert a hun-date-parser szoftver (feltehetően) egy viszonylag szorosan lehatárolt fejlesztési scope kiszolgálására jött létre. Ennek megfelelően a magyar nyelvű dátum-kifejezéseknek csak egy relitve szűk körét képes kezelni. Az általunk előzetesen felállított példatárnak hozzávetőleg 10-20 százalékára adott megfelelő megoldást (lásd "ezdate_teszt.py" - összehasonlítja a két szoftver által ugyanarra a példatárra adott válaszokat). 
+Másrészről azonban van olyan részterület is, amiben a "hun-date-parser" többet tud annál, mint amire nekünk szükségünk volt: a hun-date-parser jó teljesítményt nyújt a napon belüli napszak- és óra-perc kifejezések értelmezésében. Mi ehelyett azt a fejlesztési stratégiát követtük, ami a dátum- illetve a napon belüli időpont-beazonosítás szétválasztásából indul ki. Az általunk fejlesztett szoftver vállaltan megáll a nap-szintű időpont-meghatározások részletezési szintjén, de ebben a körben a lehető legszélesebb példatárra igyekszik támaszkodni. Ha ezen túlmenően a napon belüli időpont-meghatározások is relevánsak, akkor egy erre szakosodott másik szoftver párhuzamos használatát láttuk a legjobb megoldásnak (pl. a hun-date-parser szoftverét).
+
+
+
+
 ## Példák
 - 'jövő karácsony utáni második hétvégén'
 - '2023 második féléve harmadik hetének elején'
@@ -59,6 +69,6 @@ Előfeltétel:  Python 3.7 vagy későbbi
 - **tense**: 'future' / 'past'.  A nem egyértelmű időmeghatározások esetén jövőbeli vagy múltbeli dátumot preferáljon a függvény
 - **outtype**:
     - '**first**':    return =  '',   '2021.10.12',  '2021.12.10-2021.12.20'     Az első előforduló dátum vagy dátumtartomány.
-    - '**first+**':   ugyanaz mint a first, de a string végére beírja a mintázatot és a helyettesőjelek kimeneti értékét is.
+    - '**first+**':   ugyanaz mint a first, de - elemzési-ellenőrzési céllal - a string végére beírja a mintázatot és a helyettesőjelek kimeneti értékét is.
               Példa: '2021.10.12   pattern: [szám] [hónapnév] [szám]   outvalues: [2021, 'október', 'tizenkettedike']
     - '**all**':    '2021.10.12,2021.12.10-2021.12.20'
