@@ -25,14 +25,15 @@ Előfeltétel:  Python 3.7 vagy későbbi
 - összetett, és akár többszörösen beágyazott dátum-kifejezéseket is képes kezelni
 - kezeli a szövegesen megadott számokat, a római számokat, a sorszámokat, a ragokat és a dátumokkal kapcsolatos szinonim szófordulatokat is
 - az egyedi dátumokon túlmenően dátum-tartományokat is fel tud ismerni
+- érzéketlen a kisbetű-nagybetű, hosszú-rövid ékezet, szóköz, írásjel, ragozás és stopword eltérésekre
 
 **Mit nem tud kezelni**:
 - csak dátumbeazonosítás, napon belüli időszakokat és óra-perc időmeghatározásokat nem kezel
 - korlátozott méretű (legfeljebb pár mondat terjedelmű) input kezelésére van optimalizálva
 
 **Továbbfejlesztési lehetőségek**:
-- legyen érzéketlen a hosszú és rövid ékezetek elírására
 - a dátumszavak beazonosításakor engedjen meg kismértékű elgépeléseket is (fuzzy search)
+- a return-ben adja vissza a beazonosított dátum-kifejezések határ-pozícióit is (ebben az esetben teljes értékű annotációs algoritmusként is alkalmazható)
 
 **Összehasonlítás más szoftverekkel**\
 A jelen szoftver fejlesztésének megkezdése előtt egyetlen olyan publikus szoftvert sikerült felkutatni, amely képes a magyar dátumkifejezések viszonylag átfogó beazonosítására és értelmezésére:  "**hun-date-parser**", a "szegedai" fejlesztői git-hub oldalon.
@@ -42,6 +43,11 @@ Másrészről azonban van olyan részterület is, amiben a "hun-date-parser" tö
 
 Említést érdemel még a **Duckling** dátum extraktora. Maga a Duckling jelenleg nem sorolja fel a támogatott nyelvek között a magyar nyelvet, mindamellett a wit.ai - ami szoros kapcsolatban áll a Duckling-gal - képes felismerni és konkrét dátumra lefordítani néhány magyar nyelvű dátum-kifejezést (pl. "2021. március 2", "holnapután", "hétfőn", "pénteken", "jövő kedden";  https://wit.ai/, "MyApps" menüpont). Ez azonban csak elenyésző része annak a pédatárnak, amire egy komolyan vehető magyar nyelvű dátum-intrpretáló alkalmazásnak ki kell terjednie. 
 
+## Röviden az algoritmusról
+Ha-akkor elágazásokat tartalmazó "hard" programozási módszertan, amely véges sok (hozzávetőleg 50) generalizált mintázatra és azok rekurzív alkalmazására támaszkodik.
+A mintázat keresés első lépése a szám-szavak illetve egy lookup táblázatban megadott időhatározó és relációs szavak (többszavas kifejezések) annotálása. 
+A mintázatok beazonosítása a csökkenő méretű mozgóablakos pásztázás módszerével történik (a mozógablak mérete a szavak számára utal), és minden sikeres rész-beazonosítást követően újrakezdődik.
+Az NLP terén a legjobb eredményt a neurális hálózat alapú "soft" algortimusok és a klasszikus "hard" algoritmusok együttes alkalmazásával lehet elérni (az utóbbira példa a jelen szoftver).
 
 ## Példák
 - 'jövő karácsony utáni második hétvégén'
